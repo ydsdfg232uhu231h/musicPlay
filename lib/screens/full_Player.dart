@@ -23,8 +23,6 @@ class _FullPlayerState extends State<FullPlayer> {
   bool isPlaying = false;
   Duration total = Duration.zero;
   Duration position = Duration.zero;
-
-  // ✅ STREAM SUBSCRIPTIONS (to avoid memory leak)
   late StreamSubscription _durationSub;
   late StreamSubscription _positionSub;
   late StreamSubscription _completeSub;
@@ -34,10 +32,7 @@ class _FullPlayerState extends State<FullPlayer> {
     super.initState();
 
     isPlaying = widget.isPlaying;
-
-    // ----------------------------
-    // SAFE STREAM LISTENERS
-    // ----------------------------
+    
 
     _durationSub = widget.player.onDurationChanged.listen((d) {
       if (!mounted) return; // prevents setState after dispose
@@ -58,9 +53,6 @@ class _FullPlayerState extends State<FullPlayer> {
     });
   }
 
-  // ----------------------------
-  // PLAY / PAUSE TOGGLE
-  // ----------------------------
   Future<void> togglePlay() async {
     if (isPlaying) {
       await widget.player.pause();
@@ -77,9 +69,7 @@ class _FullPlayerState extends State<FullPlayer> {
     return "${d.inMinutes}:${(d.inSeconds % 60).toString().padLeft(2, '0')}";
   }
 
-  // ----------------------------
-  // DISPOSE — IMPORTANT
-  // ----------------------------
+  
   @override
   void dispose() {
     _durationSub.cancel();
