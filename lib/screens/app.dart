@@ -3,8 +3,8 @@ import "package:flutter/material.dart";
 import "package:musicapp/models/music.dart";
 import "package:musicapp/screens/full_Player.dart";
 import "package:musicapp/screens/home.dart";
-import "package:musicapp/screens/search.dart";
 import "package:musicapp/screens/yourlibrary.dart";
+
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}): super(key: key);
 
@@ -13,8 +13,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  AudioPlayer _audioPlayer = new AudioPlayer();
-  var Tabs = [];
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  late List<Widget> tabs;
+
   int currentTabIndex = 0;
   bool isPlaying = false;
   Musicc? music;
@@ -51,8 +52,14 @@ class _MyAppState extends State<MyApp> {
         color: Colors.blueGrey,
         child: Row(
           children: [
-            Image.network(music.image, height: 60, width: 60, fit: BoxFit.cover),
-            SizedBox(width: 10),
+            Image.network(
+              music.image,
+              height: 60,
+              width: 60,
+              fit: BoxFit.cover,
+            ),
+            const SizedBox(width: 10),
+
             Expanded(
               child: Text(
                 music.name,
@@ -85,33 +92,42 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Tabs = [Home(miniPlayer), Search(), YourLibrary()];
+    tabs = [
+      Home(miniPlayer),
+      const YourLibrary(),
+    ];
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Tabs[currentTabIndex],
       backgroundColor: Colors.black,
+      body: tabs[currentTabIndex],
+
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
-          children: [
-            miniPlayer(music),
-            BottomNavigationBar(
+        children: [
+
+          // ✔ miniPlayer is now a WIDGET
+          miniPlayer(music),
+
+          BottomNavigationBar(
             currentIndex: currentTabIndex,
-            onTap: (currentIndex){
-            currentTabIndex = currentIndex;
-            setState(() {});
-        },
-        selectedLabelStyle: TextStyle(color: Colors.white),
-        backgroundColor: Colors.black45,
-        selectedItemColor: Colors.white,
-        items: [
-        BottomNavigationBarItem(label: "Home", icon: Icon(Icons.home, color: Colors.white)),
-        BottomNavigationBarItem(label: "Search", icon: Icon(Icons.search, color: Colors.white)),
-        BottomNavigationBarItem(label: "Your Library", icon: Icon(Icons.library_books, color: Colors.white)),
-      ],
-      )]
-    ),
+            onTap: (index) {
+              setState(() => currentTabIndex = index);
+            },
+            backgroundColor: Colors.black45,
+            selectedItemColor: Colors.white,
+            items: const [
+              BottomNavigationBarItem(
+                  label: "Home",
+                  icon: Icon(Icons.home, color: Colors.white)),
+              BottomNavigationBarItem(
+                  label: "Your Library",
+                  icon: Icon(Icons.library_books, color: Colors.white)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

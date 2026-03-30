@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:musicapp/models/music.dart';
+import 'package:musicapp/server/downloader.dart';
+import 'package:path_provider/path_provider.dart';
 
 class FullPlayer extends StatefulWidget {
   final Musicc music;
@@ -24,7 +27,6 @@ class _FullPlayerState extends State<FullPlayer> {
   Duration total = Duration.zero;
   Duration position = Duration.zero;
 
-  // ✅ STREAM SUBSCRIPTIONS (to avoid memory leak)
   late StreamSubscription _durationSub;
   late StreamSubscription _positionSub;
   late StreamSubscription _completeSub;
@@ -35,12 +37,8 @@ class _FullPlayerState extends State<FullPlayer> {
 
     isPlaying = widget.isPlaying;
 
-    // ----------------------------
-    // SAFE STREAM LISTENERS
-    // ----------------------------
-
     _durationSub = widget.player.onDurationChanged.listen((d) {
-      if (!mounted) return; // prevents setState after dispose
+      if (!mounted) return;
       setState(() => total = d);
     });
 
@@ -58,16 +56,34 @@ class _FullPlayerState extends State<FullPlayer> {
     });
   }
 
-  // ----------------------------
-  // PLAY / PAUSE TOGGLE
-  // ----------------------------
+  // -------------------------------------
+  // PLAY / PAUSE + LOCAL FILE CHECK
+  // -------------------------------------
   Future<void> togglePlay() async {
     if (isPlaying) {
       await widget.player.pause();
       if (!mounted) return;
       setState(() => isPlaying = false);
     } else {
-      await widget.player.play(UrlSource(widget.music.audioURL));
+      // ---------------------------
+      // CHECK IF FILE IS DOWNLOADED
+      // ---------------------------
+      String fileName =
+          widget.music.name.replaceAll(" ", "_") + ".m4a";
+
+      Directory dir = await getApplicationDocumentsDirectory();
+      String path = "${dir.path}/$fileName";
+
+      File localFile = File(path);
+
+      if (localFile.existsSync()) {
+        // 🔥 Play offline file
+        await widget.player.play(DeviceFileSource(path));
+      } else {
+        // 🌐 Play online
+        await widget.player.play(UrlSource(widget.music.audioURL));
+      }
+
       if (!mounted) return;
       setState(() => isPlaying = true);
     }
@@ -95,6 +111,24 @@ class _FullPlayerState extends State<FullPlayer> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         title: Text(widget.music.name),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.download, color: Colors.white),
+            onPressed: () async {
+              String? path = await Downloader.downloadSong(
+                widget.music.audioURL,
+                widget.music.name.replaceAll(" ", "_"),
+              );
+
+              if (path != null && mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Downloaded to $path")),
+                );
+              }
+            },
+          )
+        ],
+
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
