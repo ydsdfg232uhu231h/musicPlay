@@ -8,15 +8,19 @@ import 'package:musicapp/screens/login_page.dart';
 
   class Home extends StatelessWidget {
     Function _miniPlayer;
+
     Home(this._miniPlayer);
     // const Home({Key? key}) : super(key: key);
-    Widget creatwCategory(Category category, BuildContext context) {
+    Widget createCategory(Category category, BuildContext context) {
       return InkWell(
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => SongListPage(category: category.name),
+              builder: (_) => SongListPage(
+                category: category.name,
+                miniPlayer: _miniPlayer, // ✅ pass player
+              ),
             ),
           );
         },
@@ -64,7 +68,7 @@ import 'package:musicapp/screens/login_page.dart';
         ),
       );
     }
-    
+
     Widget createMusic(Musicc music){
       return Padding(
         padding: EdgeInsets.all(15),
@@ -147,20 +151,6 @@ import 'package:musicapp/screens/login_page.dart';
       );
     }
 
-  Widget createGrid(){
-    return Container(
-      padding: EdgeInsets.all(10),
-      height: 280,
-       child: GridView.count(
-         padding: EdgeInsets.all(5),
-         childAspectRatio: 5/2,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-         children: createListOfCategories(context),
-          crossAxisCount: 2,
-        )
-    );
-  }
 
 
     PreferredSizeWidget createAppBar(String message, BuildContext context) {
@@ -185,32 +175,32 @@ import 'package:musicapp/screens/login_page.dart';
       );
     }
 
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-        child: SafeArea(
-     child: Container(
+    @override
+    Widget build(BuildContext context) {
+      return SingleChildScrollView(
+          child: SafeArea(
+       child: Container(
 
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blueGrey.shade300,Colors.black],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            stops: [0.1,0.3]
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.blueGrey.shade300,Colors.black],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              stops: [0.1,0.3]
+            ),
           ),
+         child: Column(
+           children: [
+             createAppBar("Good Morning",context),
+             SizedBox(
+               height: 5,
+             ),
+             createGrid(context),
+             createMusicList("Best song for you"),
+             createTopMusicList("All Time Popular song"),
+           ],
+         ),
         ),
-       child: Column(
-         children: [
-           createAppBar("Good Morning"),
-           SizedBox(
-             height: 5,
-           ),
-           createGrid(),
-           createMusicList("Best song for you"),
-           createTopMusicList("All Time Popular song"),
-         ],
-       ),
-      ),
-    ));
+      ));
+    }
   }
-}

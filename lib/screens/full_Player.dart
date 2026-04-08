@@ -65,9 +65,6 @@ class _FullPlayerState extends State<FullPlayer> {
       if (!mounted) return;
       setState(() => isPlaying = false);
     } else {
-      // ---------------------------
-      // CHECK IF FILE IS DOWNLOADED
-      // ---------------------------
       String fileName =
           widget.music.name.replaceAll(" ", "_") + ".m4a";
 
@@ -77,10 +74,8 @@ class _FullPlayerState extends State<FullPlayer> {
       File localFile = File(path);
 
       if (localFile.existsSync()) {
-        // 🔥 Play offline file
         await widget.player.play(DeviceFileSource(path));
       } else {
-        // 🌐 Play online
         await widget.player.play(UrlSource(widget.music.audioURL));
       }
 
@@ -93,9 +88,6 @@ class _FullPlayerState extends State<FullPlayer> {
     return "${d.inMinutes}:${(d.inSeconds % 60).toString().padLeft(2, '0')}";
   }
 
-  // ----------------------------
-  // DISPOSE — IMPORTANT
-  // ----------------------------
   @override
   void dispose() {
     _durationSub.cancel();
@@ -128,12 +120,10 @@ class _FullPlayerState extends State<FullPlayer> {
             },
           )
         ],
-
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Music Image
           Container(
             height: 280,
             width: 280,
@@ -147,7 +137,6 @@ class _FullPlayerState extends State<FullPlayer> {
           ),
           SizedBox(height: 40),
 
-          // Slider
           Slider(
             min: 0,
             max: total.inSeconds == 0 ? 1 : total.inSeconds.toDouble(),
@@ -161,23 +150,19 @@ class _FullPlayerState extends State<FullPlayer> {
             inactiveColor: Colors.white30,
           ),
 
-          // Time Labels
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(format(position),
-                    style: TextStyle(color: Colors.white)),
-                Text(format(total),
-                    style: TextStyle(color: Colors.white)),
+                Text(format(position), style: TextStyle(color: Colors.white)),
+                Text(format(total), style: TextStyle(color: Colors.white)),
               ],
             ),
           ),
 
           SizedBox(height: 40),
 
-          // Play / Pause Button
           IconButton(
             iconSize: 90,
             color: Colors.white,

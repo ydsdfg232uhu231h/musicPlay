@@ -3,10 +3,10 @@ import "package:flutter/material.dart";
 import "package:musicapp/models/music.dart";
 import "package:musicapp/screens/full_Player.dart";
 import "package:musicapp/screens/home.dart";
-import "package:musicapp/screens/yourlibrary.dart";
+import "package:musicapp/screens/yourlibrary.dart" as libraryy;
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}): super(key: key);
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   _MyAppState createState() => _MyAppState();
@@ -19,11 +19,12 @@ class _MyAppState extends State<MyApp> {
   int currentTabIndex = 0;
   bool isPlaying = false;
   Musicc? music;
+
   Widget miniPlayer(Musicc? music, {bool stop = false}) {
     this.music = music;
     setState(() {});
 
-    if (music == null) return SizedBox();
+    if (music == null) return const SizedBox();
 
     if (stop) {
       isPlaying = false;
@@ -46,7 +47,7 @@ class _MyAppState extends State<MyApp> {
         );
       },
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         height: 60,
         width: size.width,
         color: Colors.blueGrey,
@@ -63,10 +64,11 @@ class _MyAppState extends State<MyApp> {
             Expanded(
               child: Text(
                 music.name,
-                style: TextStyle(color: Colors.white, fontSize: 18),
+                style: const TextStyle(color: Colors.white, fontSize: 18),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+
             IconButton(
               onPressed: () async {
                 isPlaying = !isPlaying;
@@ -76,6 +78,7 @@ class _MyAppState extends State<MyApp> {
                 } else {
                   await _audioPlayer.pause();
                 }
+
                 setState(() {});
               },
               icon: Icon(
@@ -88,15 +91,17 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+
+  @override
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     tabs = [
       Home(miniPlayer),
-      const YourLibrary(),
+      libraryy.YourLibrary(miniPlayer),  // ✔ fixed
     ];
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,8 +111,6 @@ class _MyAppState extends State<MyApp> {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-
-          // ✔ miniPlayer is now a WIDGET
           miniPlayer(music),
 
           BottomNavigationBar(
@@ -119,11 +122,13 @@ class _MyAppState extends State<MyApp> {
             selectedItemColor: Colors.white,
             items: const [
               BottomNavigationBarItem(
-                  label: "Home",
-                  icon: Icon(Icons.home, color: Colors.white)),
+                label: "Home",
+                icon: Icon(Icons.home, color: Colors.white),
+              ),
               BottomNavigationBarItem(
-                  label: "Your Library",
-                  icon: Icon(Icons.library_books, color: Colors.white)),
+                label: "Your Library",
+                icon: Icon(Icons.library_books, color: Colors.white),
+              ),
             ],
           ),
         ],
